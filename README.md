@@ -13,4 +13,4 @@ Estoy haciendo estos desafíos en Rust. El repositorio es un workspace donde cad
 cargo test -p day1 -- --no-capture
 ```
 
-Es necesario colocar el `-- --no-capture` ya que estoy imprimiendo mis respuestas finales dentro de los test!
+Es necesario colocar el `-- --nocapture` ya que estoy imprimiendo mis respuestas finales dentro de los test!
