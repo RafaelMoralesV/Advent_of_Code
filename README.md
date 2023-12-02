@@ -10,5 +10,7 @@ Estoy haciendo estos desafíos en Rust. El repositorio es un workspace donde cad
 
 ```shell
 # Ejemplo: Día 1.
-cargo test -p day1 
+cargo test -p day1 -- --no-capture
 ```
+
+Es necesario colocar el `-- --no-capture` ya que estoy imprimiendo mis respuestas finales dentro de los test!
