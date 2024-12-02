@@ -15,12 +15,9 @@
           clippy
           rustfmt
           rust-analyzer
-          codecrafters-cli
-        ];
 
-        shellHook = ''
-          $SHELL
-        '';
+          zellij
+        ];
       };
     };
 }
