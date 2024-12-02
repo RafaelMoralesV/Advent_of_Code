@@ -72,7 +72,19 @@ fn check_safety(report: &Vec<u64>) -> ReportStatus {
 }
 
 fn laxer_safety(report: &Vec<u64>) -> ReportStatus {
-    todo!()
+    let mut safety = check_safety(report);
+
+    if safety == ReportStatus::Unsafe {
+        for index in (0..report.len()) {
+            safety = check_safety(&report.iter().enumerate().filter(|(i, _)| *i != index).map(|(_, n)| *n).collect::<Vec<_>>());
+
+            if safety == ReportStatus::Safe {
+                return safety;
+            }
+        }
+    }
+
+    safety
 }
 
 fn main() {

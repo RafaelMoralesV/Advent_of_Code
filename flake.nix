@@ -18,6 +18,11 @@
 
           zellij
         ];
+
+        shellHook = ''
+          export SHELL="${pkgs.bashInteractive}/bin/bash";
+          echo $SHELL;
+        '';
       };
     };
 }
