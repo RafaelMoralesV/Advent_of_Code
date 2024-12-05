@@ -89,7 +89,63 @@ impl AoC for Day4 {
     }
 
     fn puzzle_two(&self) -> u64 {
-        todo!()
+        let mut count = 0;
+
+        let x_mases: Vec<Vec<Vec<char>>> = vec![
+            vec![
+                "M*S".chars().collect(),
+                "*A*".chars().collect(),
+                "M*S".chars().collect(),
+            ],
+            vec![
+                "M*M".chars().collect(),
+                "*A*".chars().collect(),
+                "S*S".chars().collect(),
+            ],
+            vec![
+                "S*S".chars().collect(),
+                "*A*".chars().collect(),
+                "M*M".chars().collect(),
+            ],
+            vec![
+                "S*M".chars().collect(),
+                "*A*".chars().collect(),
+                "S*M".chars().collect(),
+            ],
+        ];
+
+        for (row, line) in self.letters.iter().enumerate() {
+            for (col, letter) in line.iter().enumerate() {
+                for x_mas in x_mases.iter() {
+                    if *letter == x_mas[0][0]
+                        && self
+                            .letters
+                            .get(row + 2)
+                            .and_then(|r| r.get(col))
+                            .is_some_and(|c| *c == x_mas[2][0])
+                        && self
+                            .letters
+                            .get(row + 1)
+                            .and_then(|r| r.get(col + 1))
+                            .is_some_and(|c| *c == x_mas[1][1])
+                        && self
+                            .letters
+                            .get(row)
+                            .and_then(|r| r.get(col + 2))
+                            .is_some_and(|c| *c == x_mas[0][2])
+                        && self
+                            .letters
+                            .get(row + 2)
+                            .and_then(|r| r.get(col + 2))
+                            .is_some_and(|c| *c == x_mas[2][2])
+                    {
+                        count += 1;
+                    }
+                }
+            }
+        }
+
+        count as u64
     }
 }
 
@@ -124,5 +180,25 @@ MXMXAXMASX",
         let day4 = Day4::parse(input);
 
         assert_eq!(18, day4.puzzle_one());
+    }
+
+    #[test]
+    fn puzzle_two_example() {
+        let input = String::from(
+            ".M.S......
+..A..MSMS.
+.M.S.MAA..
+..A.ASMSM.
+.M.S.M....
+..........
+S.S.S.S.S.
+.A.A.A.A..
+M.M.M.M.M.
+..........",
+        );
+
+        let day4 = Day4::parse(input);
+
+        assert_eq!(9, day4.puzzle_two());
     }
 }
