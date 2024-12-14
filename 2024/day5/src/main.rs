@@ -28,6 +28,23 @@ fn check_update(update: &Vec<usize>, rules: &Vec<Vec<u8>>) -> RuleStatus {
     RuleStatus::Valid
 }
 
+fn order_update(update: &mut Vec<usize>, rules: &Vec<Vec<u8>>) -> Vec<usize> {
+    for (i, page) in update.iter().enumerate() {
+        for (j, other) in update.iter().skip(i + 1).enumerate() {
+            if rules
+                .get(*other)
+                .is_some_and(|rules| rules.contains(&(*page as u8)))
+            {
+                update.swap(i, i + j + 1);
+
+                return order_update(update, rules);
+            }
+        }
+    }
+
+    update.to_vec()
+}
+
 impl AoC for Day5 {
     fn parse(input: String) -> Self {
         let (rules, updates) = input.split_once("\n\n").unwrap();
@@ -64,7 +81,18 @@ impl AoC for Day5 {
     }
 
     fn puzzle_two(&self) -> u64 {
-        todo!()
+        self.page_updates
+            .clone()
+            .iter_mut()
+            .filter(|update| match check_update(update, &self.before_rule) {
+                RuleStatus::Valid => false,
+                RuleStatus::Invalid => true,
+            })
+            .map(|value| order_update(value, &self.before_rule))
+            .map(|value| value[value.len() / 2])
+            .sum::<usize>()
+            .try_into()
+            .unwrap()
     }
 }
 
@@ -89,5 +117,15 @@ mod test {
         let day5 = Day5::parse(input);
 
         assert_eq!(143, day5.puzzle_one());
+    }
+
+    #[test]
+    fn puzzle_two_example() {
+        let input =
+            fs::read_to_string("example_one.txt").expect("Input file is present and intact");
+
+        let day5 = Day5::parse(input);
+
+        assert_eq!(123, day5.puzzle_two());
     }
 }
