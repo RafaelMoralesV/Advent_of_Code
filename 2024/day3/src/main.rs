@@ -71,7 +71,7 @@ impl AoC for Day3 {
         Self { instructions }
     }
 
-    fn puzzle_one(&self) -> u64 {
+    fn puzzle_one(&mut self) -> u64 {
         self.instructions
             .iter()
             .filter_map(|i| match i {
@@ -82,7 +82,7 @@ impl AoC for Day3 {
             .sum()
     }
 
-    fn puzzle_two(&self) -> u64 {
+    fn puzzle_two(&mut self) -> u64 {
         let mut doing_work = true;
         let mut total = 0;
         for instruction in self.instructions.iter() {
@@ -103,7 +103,7 @@ impl AoC for Day3 {
 
 fn main() {
     let input = fs::read_to_string("input.txt").expect("Input file is present and intact");
-    let day3 = Day3::parse(input);
+    let mut day3 = Day3::parse(input);
 
     print!("\n\tpuzzle one: > {}\n", day3.puzzle_one());
 

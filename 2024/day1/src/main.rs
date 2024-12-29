@@ -28,7 +28,7 @@ impl AoC for Day1 {
         Self { left, right }
     }
 
-    fn puzzle_one(&self) -> u64 {
+    fn puzzle_one(&mut self) -> u64 {
         self.left
             .iter()
             .zip(self.right.clone())
@@ -36,7 +36,7 @@ impl AoC for Day1 {
             .sum()
     }
 
-    fn puzzle_two(&self) -> u64 {
+    fn puzzle_two(&mut self) -> u64 {
         let mut freq: HashMap<_, u64> = HashMap::new();
 
         for num in self.right.iter() {
@@ -52,7 +52,7 @@ impl AoC for Day1 {
 
 fn main() {
     let input = fs::read_to_string("input.txt").expect("Input file is present and intact");
-    let day1 = Day1::parse(input);
+    let mut day1 = Day1::parse(input);
 
     print!("\n\tpuzzle one: > {}\n", day1.puzzle_one());
 

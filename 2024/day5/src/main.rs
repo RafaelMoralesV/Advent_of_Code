@@ -67,7 +67,7 @@ impl AoC for Day5 {
         }
     }
 
-    fn puzzle_one(&self) -> u64 {
+    fn puzzle_one(&mut self) -> u64 {
         self.page_updates
             .iter()
             .filter(|&update| match check_update(update, &self.before_rule) {
@@ -80,7 +80,7 @@ impl AoC for Day5 {
             .unwrap()
     }
 
-    fn puzzle_two(&self) -> u64 {
+    fn puzzle_two(&mut self) -> u64 {
         self.page_updates
             .clone()
             .iter_mut()
@@ -98,7 +98,7 @@ impl AoC for Day5 {
 
 fn main() {
     let input = fs::read_to_string("input.txt").expect("Input file is present and intact");
-    let day5 = Day5::parse(input);
+    let mut day5 = Day5::parse(input);
 
     print!("\n\tpuzzle one: > {}\n", day5.puzzle_one());
 
@@ -114,7 +114,7 @@ mod test {
         let input =
             fs::read_to_string("example_one.txt").expect("Input file is present and intact");
 
-        let day5 = Day5::parse(input);
+        let mut day5 = Day5::parse(input);
 
         assert_eq!(143, day5.puzzle_one());
     }
@@ -124,7 +124,7 @@ mod test {
         let input =
             fs::read_to_string("example_one.txt").expect("Input file is present and intact");
 
-        let day5 = Day5::parse(input);
+        let mut day5 = Day5::parse(input);
 
         assert_eq!(123, day5.puzzle_two());
     }

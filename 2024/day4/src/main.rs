@@ -75,7 +75,7 @@ impl AoC for Day4 {
         Self { letters }
     }
 
-    fn puzzle_one(&self) -> u64 {
+    fn puzzle_one(&mut self) -> u64 {
         let mut count = 0;
         for (row, line) in self.letters.iter().enumerate() {
             for (col, letter) in line.iter().enumerate() {
@@ -88,7 +88,7 @@ impl AoC for Day4 {
         count as u64
     }
 
-    fn puzzle_two(&self) -> u64 {
+    fn puzzle_two(&mut self) -> u64 {
         let mut count = 0;
 
         let x_mases: Vec<Vec<Vec<char>>> = vec![
@@ -151,7 +151,7 @@ impl AoC for Day4 {
 
 fn main() {
     let input = fs::read_to_string("input.txt").expect("Input file is present and intact");
-    let day3 = Day4::parse(input);
+    let mut day3 = Day4::parse(input);
 
     print!("\n\tpuzzle one: > {}\n", day3.puzzle_one());
 
@@ -177,7 +177,7 @@ MAMMMXMMMM
 MXMXAXMASX",
         );
 
-        let day4 = Day4::parse(input);
+        let mut day4 = Day4::parse(input);
 
         assert_eq!(18, day4.puzzle_one());
     }
@@ -197,7 +197,7 @@ M.M.M.M.M.
 ..........",
         );
 
-        let day4 = Day4::parse(input);
+        let mut day4 = Day4::parse(input);
 
         assert_eq!(9, day4.puzzle_two());
     }

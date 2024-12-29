@@ -26,7 +26,7 @@ impl AoC for Day2 {
         }
     }
 
-    fn puzzle_one(&self) -> u64 {
+    fn puzzle_one(&mut self) -> u64 {
         self.reports
             .iter()
             .map(check_safety)
@@ -34,7 +34,7 @@ impl AoC for Day2 {
             .count() as u64
     }
 
-    fn puzzle_two(&self) -> u64 {
+    fn puzzle_two(&mut self) -> u64 {
         self.reports
             .iter()
             .map(laxer_safety)
@@ -75,8 +75,15 @@ fn laxer_safety(report: &Vec<u64>) -> ReportStatus {
     let mut safety = check_safety(report);
 
     if safety == ReportStatus::Unsafe {
-        for index in (0..report.len()) {
-            safety = check_safety(&report.iter().enumerate().filter(|(i, _)| *i != index).map(|(_, n)| *n).collect::<Vec<_>>());
+        for index in 0..report.len() {
+            safety = check_safety(
+                &report
+                    .iter()
+                    .enumerate()
+                    .filter(|(i, _)| *i != index)
+                    .map(|(_, n)| *n)
+                    .collect::<Vec<_>>(),
+            );
 
             if safety == ReportStatus::Safe {
                 return safety;
@@ -89,7 +96,7 @@ fn laxer_safety(report: &Vec<u64>) -> ReportStatus {
 
 fn main() {
     let input = fs::read_to_string("input.txt").expect("Input file is present and intact");
-    let day2 = Day2::parse(input);
+    let mut day2 = Day2::parse(input);
 
     print!("\n\tpuzzle one: > {}\n", day2.puzzle_one());
 
@@ -111,7 +118,7 @@ mod test {
 1 3 6 7 9",
         );
 
-        let day2 = Day2::parse(input);
+        let mut day2 = Day2::parse(input);
 
         assert_eq!(2, day2.puzzle_one());
     }
@@ -127,7 +134,7 @@ mod test {
 1 3 6 7 9",
         );
 
-        let day2 = Day2::parse(input);
+        let mut day2 = Day2::parse(input);
 
         assert_eq!(4, day2.puzzle_two());
     }

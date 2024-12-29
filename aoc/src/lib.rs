@@ -1,7 +1,7 @@
 pub trait AoC {
     fn parse(input: String) -> Self;
 
-    fn puzzle_one(&self) -> u64;
+    fn puzzle_one(&mut self) -> u64;
 
-    fn puzzle_two(&self) -> u64;
+    fn puzzle_two(&mut self) -> u64;
 }
