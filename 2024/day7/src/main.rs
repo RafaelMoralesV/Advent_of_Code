@@ -18,45 +18,24 @@ enum Ops {
     Mul,
 }
 
-fn tree(
-    target: u64,
-    acum: u64,
-    curr_op: Ops,
-    data: &mut VecDeque<u64>,
-    stack: usize,
-) -> Option<u64> {
-    println!(
-        "{}ACUM: {acum}, OP: {curr_op:?}, DATA: {data:?}",
-        "> ".repeat(stack)
-    );
+fn tree_two(target: u64, acum: u64, data: &mut VecDeque<u64>) -> Option<u64> {
+    if acum == target {
+        return Some(acum);
+    }
+
     if let Some(value) = data.pop_front() {
-        let new_acum = match curr_op {
-            Ops::Sum => acum + value,
-            Ops::Mul => acum * value,
-        };
-
-        if data.is_empty() && new_acum == target {
-            return Some(new_acum);
-        }
-
-        tree(target, new_acum, Ops::Sum, data, stack + 1).or_else(|| {
-            data.push_front(value);
-
-            tree(target, acum, Ops::Mul, data, stack + 1)
-        })
+        tree_two(target, acum + value, &mut data.clone())
+            .or_else(|| tree_two(target, acum * value, &mut data.clone()))
     } else {
         None
     }
 }
 
 fn process_entry(entry: &mut Entry) -> Option<u64> {
-    println!("TARGET: {}", entry.target);
-    tree(
+    tree_two(
         entry.target,
         entry.data.pop_front().unwrap(),
-        Ops::Sum,
         &mut entry.data,
-        0,
     )
 }
 
@@ -108,7 +87,7 @@ mod test {
     use super::*;
 
     #[test]
-    fn tree_test_success() {
+    fn tree_success() {
         let mut entry = Entry {
             target: 190,
             data: VecDeque::from([10, 19]),
@@ -118,7 +97,7 @@ mod test {
     }
 
     #[test]
-    fn tree_test_fail_one() {
+    fn tree_fail_one() {
         let mut entry = Entry {
             target: 83,
             data: VecDeque::from([17, 5]),
@@ -128,7 +107,7 @@ mod test {
     }
 
     #[test]
-    fn tree_test_fail_two() {
+    fn tree_fail_two() {
         let mut entry = Entry {
             target: 156,
             data: VecDeque::from([15, 6]),
