@@ -9,12 +9,36 @@ struct Day8 {
 }
 
 type Satelites = HashMap<char, Vec<(usize, usize)>>;
+type Coords = (usize, usize);
 
-fn get_projection(one: &(usize, usize), two: &(usize, usize)) -> Option<(usize, usize)> {
+fn get_projection(one: &Coords, two: &Coords) -> Option<Coords> {
     let x = (2 * one.0).checked_sub(two.0)?;
     let y = (2 * one.1).checked_sub(two.1)?;
 
     Some((x, y))
+}
+
+fn get_harmonic_projections(one: &Coords, two: &Coords, map: &[Vec<char>]) -> Vec<Coords> {
+    let mut res = vec![*one, *two];
+    let mut one = *one;
+    let mut two = *two;
+
+    loop {
+        let next = get_projection(&one, &two);
+        if let Some(next) = next.and_then(|next| {
+            map.get(next.0)
+                .and_then(|row| row.get(next.1))
+                .map(|_| next)
+        }) {
+            res.push(next);
+            two = one;
+            one = next;
+        } else {
+            break;
+        }
+    }
+
+    res
 }
 
 impl AoC for Day8 {
@@ -46,7 +70,7 @@ impl AoC for Day8 {
                 acc.push(
                     positions
                         .iter()
-                        .tuple_combinations::<(&(_, _), &(_, _))>()
+                        .tuple_combinations::<(&Coords, &Coords)>()
                         // Genero un arreglo con ambas proyecciones.
                         .flat_map(|(a, b)| vec![get_projection(a, b), get_projection(b, a)])
                         // Filtro solo las proyecciones exitosas.
@@ -70,7 +94,34 @@ impl AoC for Day8 {
     }
 
     fn puzzle_two(&mut self) -> u64 {
-        todo!()
+        self.satelites
+            .values()
+            // Se necesitan dos o mas antenas para crear antinodos.
+            .filter(|val| val.len() > 1)
+            .fold(vec![], |mut acc, positions| {
+                acc.push(
+                    positions
+                        .iter()
+                        .tuple_combinations::<(&Coords, &Coords)>()
+                        // Genero un arreglo con ambas proyecciones.
+                        .flat_map(|(a, b)| {
+                            vec![
+                                get_harmonic_projections(a, b, &self.map),
+                                get_harmonic_projections(b, a, &self.map),
+                            ]
+                        })
+                        // Filtro solo las proyecciones exitosas.
+                        .flatten()
+                        // Fitlro solo a lugares que existen en el mapa.
+                        .collect::<Vec<_>>(),
+                );
+
+                acc
+            })
+            .into_iter()
+            .flatten()
+            .unique()
+            .count() as u64
     }
 }
 
@@ -106,6 +157,6 @@ mod test {
 
         let mut day8 = Day8::parse(input);
 
-        assert_eq!(11387, day8.puzzle_two());
+        assert_eq!(34, day8.puzzle_two());
     }
 }
