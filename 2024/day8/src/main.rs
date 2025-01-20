@@ -41,25 +41,23 @@ impl AoC for Day8 {
         self.satelites
             .values()
             // Se necesitan dos o mas antenas para crear antinodos.
-            .filter(|val| val.iter().count() > 1)
+            .filter(|val| val.len() > 1)
             .fold(vec![], |mut acc, positions| {
                 acc.push(
                     positions
                         .iter()
                         .tuple_combinations::<(&(_, _), &(_, _))>()
                         // Genero un arreglo con ambas proyecciones.
-                        .map(|(a, b)| vec![get_projection(a, b), get_projection(b, a)])
-                        .flatten()
+                        .flat_map(|(a, b)| vec![get_projection(a, b), get_projection(b, a)])
                         // Filtro solo las proyecciones exitosas.
-                        .filter_map(|x| x)
-                        .map(|(x, y)| {
+                        .flatten()
+                        // Fitlro solo a lugares que existen en el mapa.
+                        .flat_map(|(x, y)| {
                             self.map
                                 .get(x)
                                 .and_then(|row| row.get(y))
-                                .and_then(|c| Some((c, x, y)))
+                                .map(|c| (c, x, y))
                         })
-                        // Fitlro solo a lugares que existen en el mapa.
-                        .filter_map(|x| x)
                         .collect::<Vec<_>>(),
                 );
 
