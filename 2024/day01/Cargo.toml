@@ -1,8 +1,7 @@
 [package]
-name = "day8"
+name = "day01"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
 aoc = { version = "^0.1", path = "../../aoc" }
-itertools = "0.14.0"

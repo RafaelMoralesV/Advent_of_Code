@@ -13,7 +13,7 @@ enum RuleStatus {
     Invalid,
 }
 
-fn check_update(update: &Vec<usize>, rules: &Vec<Vec<u8>>) -> RuleStatus {
+fn check_update(update: &[usize], rules: &[Vec<u8>]) -> RuleStatus {
     for (i, page) in update.iter().enumerate() {
         for other in update.iter().skip(i + 1) {
             if rules
@@ -48,7 +48,7 @@ fn order_update(update: &mut Vec<usize>, rules: &Vec<Vec<u8>>) -> Vec<usize> {
 impl AoC for Day5 {
     fn parse(input: String) -> Self {
         let (rules, updates) = input.split_once("\n\n").unwrap();
-        let mut before_rule: Vec<Vec<u8>> = vec![Vec::new(); u8::max_value().into()];
+        let mut before_rule: Vec<Vec<u8>> = vec![Vec::new(); u8::MAX.into()];
 
         rules
             .lines()
