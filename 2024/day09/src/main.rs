@@ -1,4 +1,5 @@
 use aoc::AoC;
+use itertools::Itertools;
 
 #[derive(Debug)]
 struct Day9 {
@@ -9,6 +10,12 @@ struct Day9 {
 enum FSBlock {
     File { id: u64 },
     Blank,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+struct FSChunk {
+    block_type: FSBlock,
+    size: usize,
 }
 
 impl AoC for Day9 {
@@ -66,7 +73,78 @@ impl AoC for Day9 {
     }
 
     fn puzzle_two(&mut self) -> u64 {
-        todo!()
+        while self.filesystem.last() == Some(&FSBlock::Blank) {
+            self.filesystem.pop();
+        }
+
+        // Modifico el vector hacia una representacion 'de mas alto nivel' en forma de chunks.
+        let mut fs: Vec<_> = self
+            .filesystem
+            .clone()
+            .into_iter()
+            .chunk_by(|item| item.clone())
+            .into_iter()
+            .map(|(variant, group)| FSChunk {
+                block_type: variant,
+                size: group.count(),
+            })
+            .collect();
+
+        // A partir de esto tengo que iterar y mutar el vector...
+        let file_sizes = fs
+            .iter()
+            .filter_map(|f| match f.block_type {
+                FSBlock::Blank => None,
+                FSBlock::File { id } => Some((id, f.size)),
+            })
+            .rev()
+            .collect::<Vec<_>>();
+
+        for (file_id, size) in file_sizes {
+            if let Some((blank_index, _)) = fs
+                .iter()
+                .find_position(|f| matches!(f.block_type, FSBlock::Blank) && f.size >= size)
+            {
+                let (file_index, _) = fs
+                    .iter()
+                    .find_position(|i| match i.block_type {
+                        FSBlock::File { id } => file_id == id,
+                        _ => false,
+                    })
+                    .unwrap();
+
+                if blank_index > file_index {
+                    continue;
+                }
+
+                fs[blank_index].size -= size;
+                let file = fs.remove(file_index);
+
+                fs.splice(blank_index..blank_index, vec![file]);
+                fs.splice(
+                    file_index + 1..file_index + 1,
+                    vec![FSChunk {
+                        block_type: FSBlock::Blank,
+                        size,
+                    }],
+                );
+            }
+        }
+
+        self.filesystem = fs
+            .iter()
+            .map(|i| vec![i.block_type.clone(); i.size])
+            .flatten()
+            .collect::<Vec<_>>();
+
+        self.filesystem
+            .iter()
+            .map(|fsb| match fsb {
+                FSBlock::File { id } => id,
+                FSBlock::Blank => &0,
+            })
+            .enumerate()
+            .fold(0, |acc, (i, id)| acc + i as u64 * id)
     }
 }
 
@@ -100,6 +178,6 @@ mod test {
 
         let mut day9 = Day9::parse(input);
 
-        assert_eq!(34, day9.puzzle_two());
+        assert_eq!(2858, day9.puzzle_two());
     }
 }
