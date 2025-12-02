@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use aoc::AoC;
 
 #[derive(Clone, Debug)]
@@ -9,6 +11,19 @@ struct MainState {
 enum LockRotation {
     Left { steps: u32 },
     Right { steps: u32 },
+}
+
+impl Display for LockRotation {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                LockRotation::Left { steps } => format!("L{}", steps),
+                LockRotation::Right { steps } => format!("R{}", steps),
+            }
+        )
+    }
 }
 
 impl AoC for MainState {
@@ -67,27 +82,17 @@ impl AoC for MainState {
                     LockRotation::Right { steps } => i64::from(*steps),
                 };
 
-                let wrapping_zeroes = steps / 100;
-                let steps = steps % 100;
+                // Admito totalmente mi derrota. Me robe este codigo de youtube. Me gano la wea, y ya lo estaba
+                // pasando mal.
+                let dial_next = acc.0 + steps;
+                let mut revolutions = (dial_next / 100).abs() as u64;
+                let new_dial = dial_next.rem_euclid(100);
 
-                let mut dial_position = acc.0 as i64 + i64::from(steps);
-                let mut zeroes = acc.1 + wrapping_zeroes.abs() as u64;
-
-                if dial_position == 0 {
-                    zeroes += 1;
+                if acc.0 != 0 && dial_next <= 0 {
+                    revolutions += 1;
                 }
 
-                if dial_position < 0 && acc.0 == 0 {
-                    zeroes += 1;
-                    dial_position = 100 + dial_position;
-                }
-
-                if dial_position > 99 {
-                    zeroes += (dial_position / 100) as u64;
-                    dial_position %= 100;
-                };
-
-                (dial_position, zeroes)
+                (new_dial, (revolutions + acc.1) as u64)
             })
             .1
     }
