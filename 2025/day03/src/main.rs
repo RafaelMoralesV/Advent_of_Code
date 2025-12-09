@@ -10,12 +10,7 @@ impl AoC for MainState {
         Self {
             battery_arrays: input
                 .lines()
-                .map(|line| {
-                    line.as_bytes()
-                        .into_iter()
-                        .map(|c| *c - ('0' as u8))
-                        .collect()
-                })
+                .map(|line| line.as_bytes().iter().map(|c| *c - b'0').collect())
                 .collect(),
         }
     }
@@ -37,9 +32,36 @@ impl AoC for MainState {
     }
 
     fn puzzle_two(&mut self) -> u64 {
-        todo!()
+        self.battery_arrays
+            .iter()
+            .map(|arr| joltage_from_twelve(arr))
+            .sum()
     }
 }
+
+fn joltage_from_twelve(array: &[u8]) -> u64 {
+    const EXPECTED_LENGTH: usize = 12;
+    let mut missing_length = EXPECTED_LENGTH;
+
+    let mut prev_index = 0;
+    let mut total: u64 = 0;
+    while missing_length > 0 {
+        let allowed_length = array.len() - missing_length;
+
+        let (index, max) = array[prev_index..=allowed_length]
+            .iter()
+            .enumerate()
+            .fold((0, 0), |acc, (i, v)| if acc.1 < *v { (i, *v) } else { acc });
+
+        prev_index += index + 1;
+        total = total * 10 + u64::from(max);
+
+        missing_length -= 1;
+    }
+
+    total
+}
+
 fn main() {
     let input = std::fs::read_to_string("input.txt").expect("Input file is present and intact");
     let mut state = MainState::parse(input);
@@ -68,6 +90,7 @@ mod test {
         let mut state = MainState::parse(String::from("987654321111111"));
 
         assert_eq!(98, state.puzzle_one());
+        assert_eq!(987654321111, state.puzzle_two());
     }
 
     #[test]
@@ -77,6 +100,6 @@ mod test {
 
         let mut state = MainState::parse(input);
 
-        // assert_eq!(4174379265, state.puzzle_two());
+        assert_eq!(3121910778619, state.puzzle_two());
     }
 }
