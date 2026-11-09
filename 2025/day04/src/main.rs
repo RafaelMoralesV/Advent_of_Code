@@ -49,7 +49,27 @@ impl AoC for MainState {
     }
 
     fn puzzle_two(&mut self) -> u64 {
-        todo!()
+        let mut removed: u64 = 0;
+        loop {
+            let floor = self.floor.clone();
+            let prev = removed;
+
+            floor.iter().enumerate().for_each(|(x, row)| {
+                row.iter().enumerate().for_each(|(y, tile)| {
+                    if matches!(tile, FloorTile::HasRoll) {
+                        let neighbors = get_surrounding_tiles(&floor, x, y);
+                        if neighbors < 4 {
+                            removed += 1;
+                            self.floor[x][y] = FloorTile::IsEmpty;
+                        }
+                    }
+                })
+            });
+
+            if prev == removed {
+                return removed;
+            }
+        }
     }
 }
 
