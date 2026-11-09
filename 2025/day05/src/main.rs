@@ -19,21 +19,60 @@ impl AoC for MainState {
         let mut available_ids = vec![];
 
         input.lines().for_each(|line| {
-            println!("{line}");
             if line.trim().is_empty() {
                 reading_available_ids = true;
             } else {
                 if !reading_available_ids {
                     let (from, to) = line.split_once('-').unwrap();
-                    let from = from.parse::<usize>().unwrap();
-                    let to = to.parse::<usize>().unwrap();
+                    let mut from = from.parse::<usize>().unwrap();
+                    let mut to = to.parse::<usize>().unwrap();
 
-                    fresh_ids.push(Ranges { to, from });
+                    fresh_ids.iter_mut().for_each(|range: &mut Ranges| {
+                        // No coinciden
+                        // Desde esta dentro del rango
+                        // Hasta esta dentro del rango
+                        // Ambos estan dentro del rango, mi rango desaparece
+                        // El rango esta dentro de mi nuevo rango, el anterior desaparece
+                        let from_is_inside = range.from <= from && range.to >= from;
+                        let to_is_inside = range.from <= to && range.to >= to;
+
+                        if from_is_inside && to_is_inside {
+                            to = 0;
+                            from = 0;
+                        }
+
+                        if from_is_inside {
+                            from = range.to + 1;
+                        }
+
+                        if to_is_inside {
+                            to = range.from - 1;
+                        }
+
+                        // El rango anterior es contenido por el nuevo. Lo quitamos.
+                        if from <= range.from
+                            && to >= range.from
+                            && from <= range.to
+                            && to >= range.to
+                        {
+                            range.to = 0;
+                            range.from = 0;
+                        }
+                    });
+
+                    if from <= to {
+                        fresh_ids.push(Ranges { to, from });
+                    }
                 } else {
                     available_ids.push(line.parse::<usize>().unwrap());
                 }
             }
         });
+
+        let fresh_ids = fresh_ids
+            .into_iter()
+            .filter(|range| range.from != 0 && range.to != 0)
+            .collect();
 
         Self {
             fresh_ids,
@@ -59,7 +98,10 @@ impl AoC for MainState {
     }
 
     fn puzzle_two(&mut self) -> u64 {
-        todo!()
+        self.fresh_ids
+            .iter()
+            .map(|range| range.to as u64 - range.from as u64 + 1u64)
+            .sum::<u64>()
     }
 }
 
@@ -93,6 +135,8 @@ mod test {
 
         let mut state = MainState::parse(input);
 
-        // assert_eq!(3121910778619, state.puzzle_two());
+        dbg!(&state.fresh_ids);
+
+        assert_eq!(14, state.puzzle_two());
     }
 }
